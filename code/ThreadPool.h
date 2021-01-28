@@ -6,6 +6,8 @@
 #include <thread>
 #include <mutex>
 #include <queue>
+#include <condition_variable>
+#include <atomic>
 
 class ThreadPool
 {
@@ -25,7 +27,8 @@ private:
 	std::vector<std::thread> threads_;
 	std::mutex mutex_;
 	std::queue<Task> tasks_;
-	bool isRunning_;
+	std::condition_variable condition_;
+	std::atomic<bool> isRunning_;
 private:
 	void work();
 };
