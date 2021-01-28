@@ -37,3 +37,27 @@ void ThreadPool::work()
 	}
 	std::cout << "end work thread:" << std::this_thread::get_id() << std::endl;
 }	
+
+void ThreadPool::stop()
+{
+	{
+		std::unique_lock<std::mutex> lock;
+		isRunning_ = false;
+		condition_.notify_all();
+	}
+	for(std::thread& t : threads_)
+		if (t.joinable())
+			t.join();
+}
+
+void ThreadPool::append(const Task& task)
+{
+	if (isRunning_)
+	{
+		std::unique_lock<std::mutex> lock;
+		tasks_.push(task);
+		condition_.notify_one();
+	}
+}
+
+
